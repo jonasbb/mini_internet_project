@@ -1,6 +1,6 @@
 # An Open Platform to Teach How the Internet Practically Works
 
-Welcome in the official repositery of the mini-Internet project.
+Welcome in the official repository of the mini-Internet project.
 
 ### The mini-Internet project
 
@@ -19,14 +19,16 @@ With this platform, you can easily build your own mini-Internet, tailored for yo
 The documentation as well as the source code of the platform can be found in the [platform](platform) directory.
 In a nutshell, after defining your topology in configuration files, you can build your mini-Internet with a bash script and use it for your networking class. 
 
-If you use the platforn, please cite our **[technical report]( https://arxiv.org/pdf/1912.02031.pdf)**. Here is the bibtex:
+If you use the platforn, please cite our SIGCOMM CCR'20 **[paper](https://dl.acm.org/doi/pdf/10.1145/3402413.3402420)**. Here is the bibtex:
 ```
-@article{Holterbach2019AnOP,
-  title={An Open Platform to Teach How the Internet Practically Works},
-  author={Thomas Holterbach and Tobias B{\"u}hler and Tino Rellstab and Laurent Vanbever},
-  journal={ArXiv},
-  year={2019},
-  volume={abs/1912.02031}
+@article{10.1145/3402413.3402420,
+author = {Holterbach, Thomas and B\"{u}, Tobias and Rellstab, Tino and Vanbever, Laurent},
+title = {An Open Platform to Teach How the Internet Practically Works},
+year = {2020},
+issue_date = {April 2020},
+publisher = {Association for Computing Machinery},
+url = {https://doi.org/10.1145/3402413.3402420},
+journal = {SIGCOMM Comput. Commun. Rev.},
 }
 ```
 
@@ -40,6 +42,8 @@ If you use the platforn, please cite our **[technical report]( https://arxiv.org
 - We presented the mini-Internet at NANOG 78 in February 2020. The [talk](https://www.youtube.com/watch?v=8SRjTqH5Z8M&list=PLO8DR5ZGla8jSzWlrWt_cz13LLAz44rHY&index=11&t=0s) is available on youtube.
 
 - We wrote a [blogpost](https://blog.apnic.net/2020/04/14/develop-your-own-mini-internet-to-teach-students-virtually-about-network-operations/) on the APNIC website about the mini-Internet.
+
+- We presented the mini-Internet at the [AIMS-KISMET](https://www.caida.org/workshops/kismet/2002/) workshop. Our [slides](https://www.caida.org/workshops/kismet/2002/slides/kismet2002_tholterbach.pdf) are available online. 
 
 ### Contacts
 
