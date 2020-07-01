@@ -2,7 +2,7 @@
 
 In this README, we first explain how to [install the required software](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#prerequisite). Then we show how to [build](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#build-the-mini-internet), [configure](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#configure-the-mini-internet-topology), [access](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#access-the-mini-internet) and [delete](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#delete-the-mini-internet) the mini-Internet. Finally, we explain the different [monitoring tools](https://github.com/nsg-ethz/mini_internet_project/tree/master/platform#use-the-monitoring-tools-and-services).
 
-We run our mini-Internet on a server with Ubuntu 18.04 and the Linux 4.15.0 kernel.
+We run our mini-Internet on a server with Ubuntu 18.04 and the Linux 4.15.0 kernel (it also works on an Ubuntu 20.04 and the linux kernel 5.4.0).
 For more details about the used default topology as well as other example topologies, please refer to the [config](config) directory.
 
 For further information about how we use the mini-Internet at ETH Zurich, and how we implemented it, please see our [technical report](https://arxiv.org/pdf/1912.02031.pdf).
@@ -15,12 +15,7 @@ To build the mini-Internet, you need to install the following software on the se
 
 To run all the different components in the mini-Internet (hosts, switches, routers, ...) we use Docker containers.
 
-```
-sudo apt-get update
-sudo apt install docker.io
-```
-
-For further information, see the [installation guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
+Follow this [installation guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/) to install docker.
 In the directory `docker_images` you can find all the Dockerfile and docker-start files used to build the containers.
 In case you want to add some functionalities into some of the docker containers, you can
 update these files and build you own docker images:
@@ -50,6 +45,10 @@ Finally, we also need Open VPN which allows the students to connect their own de
 ```
 sudo apt-get install openvpn
 ```
+
+#### Install OpenSSL
+
+Make sure to use [OpenSSL 1.1.1](https://www.openssl.org/source/old/1.1.1/) (2018-Sep-11). If you want to use the latest OpenSSL version, then you need to use DH keys of size 2048 (see [here](https://github.com/nsg-ethz/mini_internet_project/blob/master/platform/setup/vpn_config.sh#L96)), but that will increase the startup time.
 
 ## Build the mini-Internet
 
@@ -130,15 +129,15 @@ In the directory `config_2020`, you find working configuration files for differe
 To run a mini-Internet with only 1 AS, just copy the following files:
 
 ```
-cp config_2019/AS_config_1.txt config/AS_config.txt
-cp config_2019/external_links_config_1.txt config/external_links_config.txt
+cp config_2020/AS_config_1.txt config/AS_config.txt
+cp config_2020/external_links_config_1.txt config/external_links_config.txt
 ```
 
 To run a mini-Internet with 60 ASes, copy the following files:
 
 ```
-cp config_2019/AS_config_60.txt config/AS_config.txt
-cp config_2019/external_links_config_60.txt config/external_links_config.txt
+cp config_2020/AS_config_60.txt config/AS_config.txt
+cp config_2020/external_links_config_60.txt config/external_links_config.txt
 ```
 
 We also provide configuration files for a 2 ASes and a 40 ASes topology.
@@ -327,7 +326,9 @@ root@ATLA_host:/#
 ```
 The naming convention is quite straightforward: XXXX-YYYY.groupZ, where XXXX the router where this IP address is configured, YYYY is the name of the router on the other end of the link (or "host" if there is a host). Finally Z is the AS number. The IP addresses used on the links connecting two ASes are not translated.
 
-## Some additional useful tools
+## Some additional useful tools and features
+
+#### Restart a container
 
 It can happen that a container crashes while the mini-Internet is running. For instance we have observed that the SSH containers sometimes fail if a student starts more than 100 processes in it (100 is the max number of processes that can run in this container). It is a hassle to restart a container and connect it to the other containers according to the topology, thus the script `restart_container.sh` is automatically generated and can be used to reconnect a container to the other containers automatically.
 
@@ -340,3 +341,7 @@ docker start CONTAINER_NAME
 ```
 
 Note: sometimes the MAC address on some interfaces must follow a particular scheme (for instance the ones connected to the MATRIX container). Configuring these MAC addresses must be done manually.
+
+#### MPLS and Multicast
+
+The mini-Internet can support MPLS and Multicast. To activate MPLS you must turn on the ldp daemon by replacing `ldpd=no` with `ldpd=yes` in `config/daemons`. Similarly, for Multicast you need to replace `pimd=no` with `pimd=yes`. 

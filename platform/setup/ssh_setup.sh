@@ -17,7 +17,7 @@ n_extern_links=${#extern_links[@]}
 echo -n "-- add-br ssh_to_group " >> "${DIRECTORY}"/groups/add_bridges.sh
 
 subnet_bridge="$(subnet_ext_sshContainer -1 "bridge")"
-echo "ifconfig ssh_to_group $subnet_bridge up" >> "${DIRECTORY}"/groups/ip_setup.sh
+echo "ip a add $subnet_bridge dev ssh_to_group" >> "${DIRECTORY}"/groups/ip_setup.sh
 
 # General a pair of keys for the server, and put the public in the proxy container
 ssh-keygen -t rsa -b 4096 -C "comment" -P "" -f "groups/id_rsa" -q
@@ -51,6 +51,7 @@ for ((k=0;k<group_numbers;k++)); do
 
         # genarate key pair for authentification between ssh container and group containers
         ssh-keygen -t rsa -b 4096 -C "comment" -P "" -f "groups/g"${group_number}"/id_rsa" -q
+        echo 'command="vtysh" '$(cat "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub) > "${DIRECTORY}"/groups/g"${group_number}"/id_rsa_command.pub
 
         # copy private key to container and change access rights
         docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa "${group_number}"_ssh:/root/.ssh/id_rsa
@@ -67,7 +68,8 @@ for ((k=0;k<group_numbers;k++)); do
         subnet_ssh_to_cont="$(subnet_sshContainer_groupContainer "${group_number}" -1 -1 "sshContainer")"
 
         echo -n "-- add-br "${group_number}"-ssh " >> "${DIRECTORY}"/groups/add_bridges.sh
-        echo "ifconfig "${group_number}"-ssh 0.0.0.0 up" >> "${DIRECTORY}"/groups/ip_setup.sh
+        echo "ip a add 0.0.0.0 dev "${group_number}"-ssh" >> "${DIRECTORY}"/groups/ip_setup.sh
+
 
         # Connect the proxy container to the virtual devices
         ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_ssh --ipaddress="${subnet_ssh_to_cont}"
@@ -86,7 +88,7 @@ for ((k=0;k<group_numbers;k++)); do
             #ssh login for router"
             subnet_router="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "router")"
             ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"router --ipaddress="${subnet_router}"
-            docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys
+            docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa_command.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys
 
             if [ "${property2}" == "host" ];then
                 #ssh login for host
