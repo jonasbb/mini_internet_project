@@ -44,6 +44,11 @@ for ((k=0;k<group_numbers;k++)); do
         n_l2_hosts=${#l2_hosts[@]}
         n_l2_links=${#l2_links[@]}
 
+        if [ "${n_l2_switches}" = "0" -a "${n_l2_hosts}" = "0" -a "${n_l2_links}" = "0" ]; then
+            # No L2 config, skip
+            continue
+        fi
+
         br_name="l2-"${group_number}
         echo -n "-- add-br "${br_name}" " >> "${DIRECTORY}"/groups/add_bridges.sh
         echo "ovs-vsctl set bridge "${br_name}" other-config:forward-bpdu=true" >> "${DIRECTORY}"/groups/l2_init_switch.sh
@@ -103,20 +108,21 @@ for ((k=0;k<group_numbers;k++)); do
         for ((l=0;l<n_l2_hosts;l++)); do
             host_l=(${l2_hosts[$l]})
             hname="${host_l[0]}"
-            l2name="${host_l[1]}"
-            sname="${host_l[2]}"
-            throughput="${host_l[3]}"
-            delay="${host_l[4]}"
+            dname="${host_l[1]}"
+            l2name="${host_l[2]}"
+            sname="${host_l[3]}"
+            throughput="${host_l[4]}"
+            delay="${host_l[5]}"
 
             if [[ $hname == vpn* ]]; then
                 echo "ip link add ${group_number}-$hname type veth peer name g${group_number}_$hname" >> "${DIRECTORY}"/groups/add_vpns.sh
                 echo "PID=$(sudo docker inspect -f '{{.State.Pid}}' "${group_number}_L2_${l2name}_${sname}")" >> "${DIRECTORY}"/groups/add_vpns.sh
                 echo "ip link set ${group_number}-$hname netns \$PID" >> "${DIRECTORY}"/groups/add_vpns.sh
-                echo "docker exec -d "${group_number}""_L2_""${l2name}_${sname}" ifconfig ${group_number}-$hname 0.0.0.0 up" >> "${DIRECTORY}"/groups/add_vpns.sh
+                echo "docker exec -d "${group_number}""_L2_""${l2name}_${sname}" ip link set dev ${group_number}-$hname up" >> "${DIRECTORY}"/groups/add_vpns.sh
                 echo "docker exec -d "${group_number}""_L2_""${l2name}_${sname}" ovs-vsctl add-port br0 ${group_number}-$hname" >> "${DIRECTORY}"/groups/add_vpns.sh
 
-                echo "ip a add 0.0.0.0 dev g${group_number}_$hname" >> groups/add_vpns.sh
-                echo "ip a add 0.0.0.0 dev tap_g"${group_number}_$hname >> groups/add_vpns.sh
+                echo "ip link set dev g${group_number}_$hname up" >> groups/add_vpns.sh
+                echo "ip link set dev tap_g${group_number}_$hname up" >> groups/add_vpns.sh
 
                 echo "sudo ovs-vsctl add-port vpnbr_${group_k}_${host_l} tap_g"${group_number}_$hname >> groups/add_vpns.sh
                 echo "sudo ovs-vsctl add-port vpnbr_${group_k}_${host_l} g${group_number}_$hname" >> groups/add_vpns.sh

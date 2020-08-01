@@ -18,6 +18,7 @@ echo -n "-- add-br ssh_to_group " >> "${DIRECTORY}"/groups/add_bridges.sh
 
 subnet_bridge="$(subnet_ext_sshContainer -1 "bridge")"
 echo "ip a add $subnet_bridge dev ssh_to_group" >> "${DIRECTORY}"/groups/ip_setup.sh
+echo "ip link set dev ssh_to_group up" >> "${DIRECTORY}"/groups/ip_setup.sh
 
 # General a pair of keys for the server, and put the public in the proxy container
 ssh-keygen -t rsa -b 4096 -C "comment" -P "" -f "groups/id_rsa" -q
@@ -68,7 +69,7 @@ for ((k=0;k<group_numbers;k++)); do
         subnet_ssh_to_cont="$(subnet_sshContainer_groupContainer "${group_number}" -1 -1 "sshContainer")"
 
         echo -n "-- add-br "${group_number}"-ssh " >> "${DIRECTORY}"/groups/add_bridges.sh
-        echo "ip a add 0.0.0.0 dev "${group_number}"-ssh" >> "${DIRECTORY}"/groups/ip_setup.sh
+        echo "ip link set dev ${group_number}-ssh up" >> "${DIRECTORY}"/groups/ip_setup.sh
 
 
         # Connect the proxy container to the virtual devices
@@ -90,7 +91,7 @@ for ((k=0;k<group_numbers;k++)); do
             ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"router --ipaddress="${subnet_router}"
             docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa_command.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys
 
-            if [ "${property2}" == "host" ];then
+            if [[ "${property2}" == host* ]];then
                 #ssh login for host
                 subnet_host="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "host")"
                 ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"host --ipaddress="${subnet_host}"
@@ -118,8 +119,8 @@ for ((k=0;k<group_numbers;k++)); do
                     for ((l=0;l<n_l2_hosts;l++)); do
                         host_l=(${l2_hosts[$l]})
                         hname="${host_l[0]}"
-                        l2_name_tmp="${host_l[1]}"
-                        sname="${host_l[2]}"
+                        l2_name_tmp="${host_l[2]}"
+                        sname="${host_l[3]}"
                         cont_name=${group_number}_L2_${l2_name_tmp}_${hname}
 
                         if [ $l2_name_tmp == $l2_name ]; then
