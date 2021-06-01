@@ -37,12 +37,13 @@ journal = {SIGCOMM Comput. Commun. Rev.},
 
 ### News
 
-*3/12/20:* Added the BGP VPN MPLS and Multicast exercises of our Advanced Topic in Computer Networks course \
-*29/09/20:* Changed the Dockerfile for the router image. Now FRR is compiled from the source with a particular version of the libyang library so that VRF are supported \
-*08/07/20:* Added the docker image to use for the hosts in the config files \
-*29/06/20:* Added support for MPLS and Multicast \
+*20/05/21:* Added our assignment for 2021! You can find it [here](https://github.com/nsg-ethz/mini_internet_project/tree/master/communication_networks_course/2021_assignement_eth). This year, we added support for IPv6 and asked our students to configure 6in4 tunnels. \
+*3/12/20:* Added the BGP VPN MPLS and Multicast exercises of our Advanced Topic in Computer Networks course. \
+*29/09/20:* Changed the Dockerfile for the router image. Now FRR is compiled from the source with a particular version of the libyang library so that VRF are supported. \
+*08/07/20:* Added the docker image to use for the hosts in the config files. \
+*29/06/20:* Added support for MPLS and Multicast. \
 *15/04/20:* Fixed a security issue with the docker containers. Now students' containers only run with limited capabilities. \
-*18/03/20:* Several fixes (e.g., prevent containers to crash because too many processes are running) and improvements (e.g., configure different internal topologies)
+*18/03/20:* Several fixes (e.g., prevent containers to crash because too many processes are running) and improvements (e.g., configure different internal topologies).
 
 ### Useful links
 
@@ -69,7 +70,7 @@ We are grateful to everyone who contributed to improve the platform.
 We thank our ETH colleagues Rudiger Birkner for all his work on the platform as a teaching assistant as well as Roland Meier for the connectivity matrix. 
 
 We are thankful to the following ETH students who helped us developping the platform during their studies:
-- Martin Vahlensieck, 2021 (BGP policy analyzer)
+- Martin Vahlensieck, 2021 (BGP policy analyzer and auto-completion in the ssh container)
 - Denis Mikhaylov, 2020 (Implementation of RPKI)
 
 ### Disclaimer

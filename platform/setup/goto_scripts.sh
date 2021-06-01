@@ -52,7 +52,7 @@ for ((k=0;k<n_groups;k++)); do
             rname="${router_i[0]}"
             property1="${router_i[1]}"
             property2="${router_i[2]}"
-            l2_name=$(echo $property2 | cut -f 2 -d '-')
+            l2_name=$(echo $property2 | cut -d ':' -f 1 | cut -f 2 -d '-')
             l2_id[$l2_name]=1000000
             l2_cur[$l2_name]=0
         done
@@ -62,35 +62,45 @@ for ((k=0;k<n_groups;k++)); do
             rname="${router_i[0]}"
             property1="${router_i[1]}"
             property2="${router_i[2]}"
-            l2_name=$(echo $property2 | cut -f 2 -d '-')
+            rcmd="${router_i[3]}"
+            dname=$(echo $property2 | cut -d ':' -f 2)
+            l2_name=$(echo $property2 | cut -d ':' -f 1 | cut -f 2 -d '-')
 
             if [[ ${l2_id[$l2_name]} == 1000000 ]]; then
                 l2_id[$l2_name]=$i
             fi
 
-            if [[ "${property2}" == host* ]];then
-
+            if [[ ! -z "${dname}" ]];then
                 # ssh to host
                 echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""host"\" ]; then" >> "${file_loc}"
-                echo "	subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "host")" >> "${file_loc}"
-                echo "	ssh -t -o "StrictHostKeyChecking=no" root@\"\${subnet%???}"\" >> "${file_loc}"
-                echo "	exit" >> "${file_loc}"
+                echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "host")" >> "${file_loc}"
+                echo "  ssh -t -o "StrictHostKeyChecking=no" root@\"\${subnet%???}"\" >> "${file_loc}"
+                echo "  exit" >> "${file_loc}"
                 echo "fi" >> "${file_loc}"
             fi
 
-            #ssh to router vtysh
-            echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""router"\" ]; then" >> "${file_loc}"
-            echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "router")" >> "${file_loc}"
-            echo "  ssh -t -o StrictHostKeyChecking=no root@\"\${subnet%???}\"" >> "${file_loc}"
-            echo "  exit" >> "${file_loc}"
-            echo "fi" >> "${file_loc}"
+            if [ "${rcmd}" == "vtysh" ]; then
+                #ssh to router vtysh
+                echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""router"\" ]; then" >> "${file_loc}"
+                echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "router")" >> "${file_loc}"
+                echo "  ssh -t -o StrictHostKeyChecking=no root@\"\${subnet%???}\"" >> "${file_loc}"
+                echo "  exit" >> "${file_loc}"
+                echo "fi" >> "${file_loc}"
+            else
+                #ssh to router vtysh
+                echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""router"\" ]; then" >> "${file_loc}"
+                echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "router")" >> "${file_loc}"
+                echo "  ssh -t -o StrictHostKeyChecking=no root@\"\${subnet%???}\" vtysh" >> "${file_loc}"
+                echo "  exit" >> "${file_loc}"
+                echo "fi" >> "${file_loc}"
 
-            #shh to router container
-            # echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""container"\" ]; then" >> "${file_loc}"
-            # echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "router")" >> "${file_loc}"
-            # echo "  ssh -t -o StrictHostKeyChecking=no root@\"\${subnet%???}\"" >> "${file_loc}"
-            # echo "  exit" >> "${file_loc}"
-            # echo "fi" >> "${file_loc}"
+                #shh to router container
+                echo "if [ \"\${location}\" == \"$rname\" ] && [ \"\${device}\" == \""container"\" ]; then" >> "${file_loc}"
+                echo "  subnet=""$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1  "router")" >> "${file_loc}"
+                echo "  ssh -t -o StrictHostKeyChecking=no root@\"\${subnet%???}\" bash" >> "${file_loc}"
+                echo "  exit" >> "${file_loc}"
+                echo "fi" >> "${file_loc}"
+            fi
 
         done
 

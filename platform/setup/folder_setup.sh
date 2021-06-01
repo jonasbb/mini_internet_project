@@ -37,15 +37,22 @@ for ((k=0;k<group_numbers;k++)); do
 
             location="${DIRECTORY}"/groups/g"${group_number}"/"${rname}"
             mkdir "${location}"
-            # router configs are safe periodically in frr.con
+            # router configs are saved periodically in frr.con
             touch  "${location}"/frr.conf
             cp config/daemons "${location}"/daemons
             touch  "${location}"/connectivity.txt
             touch  "${location}"/looking_glass.txt
+            touch  "${location}"/looking_glass_json.txt
         done
+
+        echo "#!/bin/bash" > "${DIRECTORY}"/groups/g"${group_number}"/6in4_setup.sh
+        chmod +x "${DIRECTORY}"/groups/g"${group_number}"/6in4_setup.sh
+
+
     else
         location="${DIRECTORY}"/groups/g"${group_number}"
         touch  "${location}"/frr.conf
+        touch  "${location}"/looking_glass.txt
         cp config/daemons "${location}"/daemons
     fi
 done
@@ -63,6 +70,7 @@ echo "#!/bin/bash" > "${location}"/add_vpns.sh
 echo "#!/bin/bash" > "${location}"/del_vpns.sh
 echo "#!/bin/bash" > "${location}"/restart_container.sh
 echo "#!/bin/bash" > "${location}"/open_vpn_ports.sh
+
 
 chmod +x "${location}"/ip_setup.sh
 chmod +x "${location}"/add_ports.sh
